@@ -1,0 +1,25 @@
+{
+	"name": "designtoken-generator",
+	"version": "0.0.1",
+	"description": "Utilities for easy generation of Design Tokens. Supports converting from SCSS and TS/JSON to CSS vars",
+	"scripts": {
+		"test": "sass src/scss/usage.scss"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jakobe/designtoken-generator.git"
+	},
+	"author": {
+		"name": "Jakob Engelbrecht",
+		"email": "jakob@basher.dk"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/jakobe/designtoken-generator/issues"
+	},
+	"homepage": "https://github.com/jakobe/designtoken-generator#readme",
+	"dependencies": {},
+	"devDependencies": {
+		"sass": "^1.42.1"
+	}
+}
