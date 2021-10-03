@@ -1,0 +1,33 @@
+@function str-split($string, $separator) {
+	$i: str-index($string, $separator);
+	@if $i != null {
+		@return join(
+			str-slice($string, 1, $i - 1),
+			str-split(str-slice($string, $i + str-length($separator)), $separator)
+		);
+	}
+	@return $string;
+}
+
+//From https://kittygiraudel.com/2013/08/08/advanced-sass-list-functions/
+@function list-slice($list, $start: 1, $end: length($list)) {
+	$result: ();
+
+	@for $i from $start through $end {
+		$result: join($result, nth($list, $i));
+	}
+
+	@return $result;
+}
+
+@function list-to-string($list, $separator: ',') {
+	$result: null;
+	@each $element in $list {
+		$result: if(
+			$result == null,
+			$element,
+			'#{$result}#{$separator}#{$element}'
+		);
+	}
+	@return $result;
+}

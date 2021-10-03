@@ -1,0 +1,177 @@
+@use 'utils';
+
+$-use-bem: false;
+$-prefix: 'tokens';
+
+@mixin configure($prefix: null, $use-bem: null) {
+	@if $prefix != null {
+		$-prefix: $prefix !global;
+	}
+	@if $use-bem != null {
+		$-use-bem: $use-bem !global;
+	}
+}
+
+@mixin _output-token(
+	$root-tokens-map,
+	$root-prefix,
+	$key,
+	$value,
+	$separator,
+	$use-bem,
+	$value-as-string,
+	$level
+) {
+	@if (type_of($value) == map) {
+		@include _output-map(
+			$root-tokens-map,
+			$root-prefix,
+			$value,
+			$key,
+			$separator,
+			$use-bem,
+			$value-as-string,
+			$level
+		);
+	} @else {
+		#{$key}: _output-value(
+			$root-tokens-map,
+			$value,
+			$root-prefix,
+			$value-as-string,
+			$use-bem
+		);
+	}
+}
+
+@function _output-value(
+	$tokens-map,
+	$value,
+	$root-prefix,
+	$value-as-string,
+	$use-bem
+) {
+	$value: _get-value(
+		$tokens-map,
+		$value,
+		$root-prefix: $root-prefix,
+		$use-bem: $use-bem
+	);
+	$is-css-var: type_of($value) == string and str-index($value, 'var(') == 1;
+	@if (
+		$value-as-string == true or (type_of($value) == string and not $is-css-var)
+	) {
+		$value: '#{$value}';
+	}
+	@return $value;
+}
+
+@mixin _output-map(
+	$root-tokens-map,
+	$root-prefix: null,
+	$tokens-map,
+	$prefix: null,
+	$separator: $-separator,
+	$use-bem: false,
+	$value-as-string: false,
+	$level: 1
+) {
+	@each $key, $value in $tokens-map {
+		$current-separator: $separator;
+		@if $use-bem {
+			@if ($level == 2) {
+				$current-separator: '__';
+			}
+			@if ($level == 3) {
+				$current-separator: '--';
+			}
+		}
+		$sub-prefix: if($prefix, #{$prefix}#{$current-separator}, null);
+
+		$sub-key: #{$sub-prefix}#{$key};
+		@if (type_of($value) == map) {
+			/* #{to-upper-case($key)} */
+		}
+		@include _output-token(
+			$root-tokens-map,
+			$root-prefix,
+			$sub-key,
+			$value,
+			$separator,
+			$use-bem,
+			$value-as-string,
+			$level + 1
+		);
+	}
+}
+
+@function _get-value(
+	$tokens-map,
+	$value,
+	$root-prefix,
+	$lookup-prefix: 'lookup.',
+	$output-as-var: true,
+	$use-bem: false
+) {
+	@if (type_of($value) != string) {
+		@return $value;
+	}
+	@if (str-index($value, $lookup-prefix) != 1) {
+		@return $value;
+	}
+	$lookup-key: str-slice($value, str-length($lookup-prefix) + 1);
+	$lookup-keys: utils.str-split($lookup-key, '.');
+	$first-key: nth($lookup-keys, 1);
+	$remaining-keys: utils.list-slice($lookup-keys, 2);
+
+	$lookup-value: map-get($tokens-map, $first-key, $remaining-keys...);
+	@if ($lookup-value == null) {
+		@error "'#{$lookup-key}' not found in $tokens-map! Check your spelling or add missing token.";
+	}
+	$value: if(
+		$output-as-var,
+		_keys-to-var($lookup-keys, $root-prefix, $use-bem),
+		$lookup-value
+	);
+	@return $value;
+}
+
+@function _keys-to-var($lookup-keys, $root-prefix, $use-bem) {
+	$flat-key: utils.list-to-string($lookup-keys, '-');
+	@if $use-bem {
+		$block: nth($lookup-keys, 1);
+		$element: nth($lookup-keys, 2);
+		$modifiers: if(
+			length($lookup-keys) >= 3,
+			utils.list-slice($lookup-keys, 3),
+			()
+		);
+		$modifiers-with-dash: utils.list-to-string($modifiers, '-');
+		$flat-key: #{$block}__#{$element}--#{$modifiers-with-dash};
+	}
+	@return var(--#{$root-prefix}-#{$flat-key});
+}
+
+@mixin output-styles-json($tokens-map, $root-name: 'styles') {
+	#{$root-name} {
+		@include _output-map(
+			$root-tokens-map: $tokens-map,
+			$tokens-map: $tokens-map,
+			$separator: '.',
+			$value-as-string: true
+		);
+	}
+}
+
+@mixin output-styles-css($tokens-map, $prefix: $-prefix, $use-bem: $-use-bem) {
+	:root {
+		@include _output-map(
+			$root-tokens-map: $tokens-map,
+			$root-prefix: $prefix,
+			$tokens-map: $tokens-map,
+			$prefix: '--#{$prefix}',
+			$separator: '-',
+			$use-bem: $use-bem
+		);
+	}
+}
