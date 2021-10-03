@@ -12,6 +12,10 @@
 //From https://kittygiraudel.com/2013/08/08/advanced-sass-list-functions/
 @function list-slice($list, $start: 1, $end: length($list)) {
 	$result: ();
+	@if ($start > length($list)) {
+		@return ();
+	}
+	$end: min($end, length($list));
 
 	@for $i from $start through $end {
 		$result: join($result, nth($list, $i));
@@ -21,13 +25,9 @@
 }
 
 @function list-to-string($list, $separator: ',') {
-	$result: null;
+	$result: '';
 	@each $element in $list {
-		$result: if(
-			$result == null,
-			$element,
-			'#{$result}#{$separator}#{$element}'
-		);
+		$result: if($result == '', $element, '#{$result}#{$separator}#{$element}');
 	}
 	@return $result;
 }
