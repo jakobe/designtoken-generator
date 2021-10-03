@@ -1,0 +1,93 @@
+@use '../utils';
+@use 'sass/true' as *;
+
+@include describe('str-split [function]') {
+	@include it('splits a string into a single-dimensional list') {
+		@include assert-equal(
+			utils.str-split('this.is.awesome', '.'),
+			('this' 'is' 'awesome')
+		);
+	}
+
+	@include it(
+		'returns the string as a single-element list if separator is not found'
+	) {
+		@include assert-equal(
+			utils.str-split('this is awesome', '.'),
+			('this is awesome')
+		);
+	}
+}
+
+@include describe('list-slice [function]') {
+	@include it('returns the entire list when $start and $end is not defined') {
+		@include assert-equal(
+			utils.list-slice(('this' 'is' 'awesome')),
+			('this' 'is' 'awesome')
+		);
+	}
+
+	@include it(
+		'returns a copy of the list from $start to end of list when only $start is defined'
+	) {
+		@include assert-equal(
+			utils.list-slice(('this' 'is' 'awesome'), 2),
+			('is' 'awesome')
+		);
+	}
+
+	@include it(
+		'returns a copy of the list from start of list to $end when only $end is defined'
+	) {
+		@include assert-equal(
+			utils.list-slice(('this' 'is' 'awesome'), $end: 2),
+			('this' 'is')
+		);
+	}
+
+	@include it('returns a copy of the list from $start to $end') {
+		@include assert-equal(
+			utils.list-slice(('this' 'is' 'truly' 'awesome' 'and' 'sweet'), 2, 4),
+			('is' 'truly' 'awesome')
+		);
+	}
+
+	@include it(
+		'returns a copy of the list from $start to end of list when $end is greater than the length of the list'
+	) {
+		@include assert-equal(
+			utils.list-slice(('this' 'is' 'awesome'), 2, 99),
+			('is' 'awesome')
+		);
+	}
+
+	@include it(
+		'returns an empty list when $start is greater than the length of the list'
+	) {
+		@include assert-equal(utils.list-slice(('this' 'is' 'awesome'), 99), ());
+	}
+}
+
+@include describe('list-to-string [function]') {
+	@include it(
+		'concatenates a single-dimensional list to a string with default separator'
+	) {
+		@include assert-equal(
+			utils.list-to-string(('this' 'is' 'awesome')),
+			'this,is,awesome'
+		);
+	}
+
+	@include it(
+		'concatenates a single-dimensional list to a string with the provided separator'
+	) {
+		@include assert-equal(
+			utils.list-to-string(('this' 'is' 'awesome'), ' '),
+			'this is awesome'
+		);
+	}
+
+	@include it('returns an empty string when list is empty') {
+		@include assert-equal(utils.list-to-string(()), '');
+	}
+}

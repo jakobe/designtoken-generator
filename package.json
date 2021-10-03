@@ -3,7 +3,8 @@
 	"version": "0.0.1",
 	"description": "Utilities for easy generation of Design Tokens. Supports converting from SCSS and TS/JSON to CSS vars",
 	"scripts": {
-		"test": "sass src/scss/usage.scss"
+		"start": "sass --no-source-map src/scss/usage.scss src/scss/usage.css",
+		"test": "sass --load-path=node_modules/sass-true src/scss/design-tokens/tests/_utils.spec.scss"
 	},
 	"repository": {
 		"type": "git",
