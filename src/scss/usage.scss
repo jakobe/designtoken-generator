@@ -1,0 +1,70 @@
+@use 'design-tokens';
+
+$color-contrast-dark: #1c1c1c;
+$color-contrast-light: #fff;
+
+$colors-brand: (
+	primary: #264653,
+	secondary: #264653,
+	tertiary: #e9c46a,
+);
+
+$colors-neutrals: (
+	background: #f6f6f6,
+);
+
+$button: (
+	background: 'lookup.colors.brand.primary',
+);
+
+$elevations: (
+	z2: (
+		0 5px 10px -10px rgba(28, 28, 28, 0.3),
+		0 0 5px 0 rgba(28, 28, 28, 0.08),
+	),
+	z4: (
+		0 10px 15px -10px rgba(28, 28, 28, 0.3),
+		0 0 5px 0 rgba(28, 28, 28, 0.08),
+	),
+	z8: (
+		0 20px 30px -15px rgba(28, 28, 28, 0.3),
+		0 0 5px 0 rgba(28, 28, 28, 0.08),
+	),
+);
+
+$styles: (
+	colors: (
+		brand:
+			design-tokens.color-generate-color-variations(
+				$colors-brand,
+				$color-contrast-dark,
+				$color-contrast-light,
+				$include-contrast: true,
+				$include-rgb: true
+			),
+		neutral:
+			design-tokens.color-generate-color-variations(
+				$colors-neutrals,
+				$color-contrast-dark,
+				$color-contrast-light,
+				$include-contrast: true,
+				$include-rgb: true
+			),
+	),
+	elevations: $elevations,
+	button: $button,
+);
+
+// @include token-helper.output-styles-json($styles);
+
+/* KEBAB */
+// @include design-tokens.configure($prefix: 'my-designsystem');
+@include design-tokens.output-styles-css($styles);
+/* BEM */
+@include design-tokens.configure($use-bem: true);
+@include design-tokens.configure($prefix: 'hest');
+@include design-tokens.output-styles-css($styles, 'my-ds');
+@include design-tokens.output-styles-css($styles);
+
+/* BEM */
+// @include token-helper.output-styles-css($styles, $use-bem: true);
