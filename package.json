@@ -20,6 +20,7 @@
 	"homepage": "https://github.com/jakobe/designtoken-generator#readme",
 	"dependencies": {},
 	"devDependencies": {
-		"sass": "^1.42.1"
+		"sass": "^1.42.1",
+		"sass-true": "^6.0.1"
 	}
 }
